@@ -1,0 +1,5 @@
+//
+// Prefix header for all source files of the 'ScopeBar' target in the 'ScopeBar' project.
+//
+
+#include <Carbon/Carbon.h>
