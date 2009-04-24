@@ -31,6 +31,7 @@
 	
 	self.groups = [NSMutableArray arrayWithCapacity:0];
 	scopeBar.delegate = self;
+	scopeBar.dataSource = self;
 	
 	// Add first group of items.
 	NSArray *items = [NSArray arrayWithObjects:

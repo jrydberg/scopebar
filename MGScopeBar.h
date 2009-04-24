@@ -11,7 +11,8 @@
 
 @interface MGScopeBar : NSView {
 @private
-	IBOutlet id <MGScopeBarDelegate, NSObject> delegate; // weak ref.
+	IBOutlet id delegate; // weak ref.
+    IBOutlet id dataSource;
 	NSMutableArray *_separatorPositions; // x-coords of separators, indexed by their group-number.
 	NSMutableArray *_groups; // groups of items.
 	NSView *_accessoryView; // weak ref since it's a subview.
@@ -24,7 +25,8 @@
 	BOOL _smartResizeEnabled; // whether to do our clever collapsing/expanding of buttons when resizing (Smart Resizing).
 }
 
-@property(assign) id delegate; // should implement the MGScopeBarDelegate protocol.
+@property(assign) id delegate;   // should implement the MGScopeBarDataSource protocol.
+@property(assign) id dataSource; // should implement the MGScopeBarDelegate protocol.
 
 - (void)reloadData; // causes the scope-bar to reload all groups/items from its delegate.
 - (void)sizeToFit; // only resizes vertically to optimum height; does not affect width.

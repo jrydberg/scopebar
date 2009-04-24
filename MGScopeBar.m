@@ -92,6 +92,8 @@
 - (void)dealloc
 {
 	delegate = nil;
+	dataSource = nil;
+
 	if (_accessoryView) {
 		[_accessoryView removeFromSuperview];
 		_accessoryView = nil; // weak ref
@@ -136,9 +138,9 @@
 	_totalGroupsWidth = 0;
 	_totalGroupsWidthForPopups = 0;
 	
-	// Configure contents via delegate.
-	if (self.delegate && [delegate conformsToProtocol:@protocol(MGScopeBarDelegate)]) {
-		int numGroups = [delegate numberOfGroupsInScopeBar:self];
+	// Configure contents via dataSource.
+	if (self.dataSource) { // [dataSource conformsToProtocol:@protocol(MGScopeBarDataSource)]) {
+		int numGroups = [dataSource numberOfGroupsInScopeBar:self];
 		
 		if (numGroups > 0) {
 			_separatorPositions = [[NSMutableArray alloc] initWithCapacity:numGroups];
@@ -148,13 +150,13 @@
 			
 			int xCoord = SCOPE_BAR_H_INSET;
 			NSRect ctrlRect = NSZeroRect;
-			BOOL providesImages = [delegate respondsToSelector:@selector(scopeBar:imageForItem:inGroup:)];
+			BOOL providesImages = [dataSource respondsToSelector:@selector(scopeBar:imageForItem:inGroup:)];
 			
 			for (int groupNum = 0; groupNum < numGroups; groupNum++) {
 				// Add separator if appropriate.
 				BOOL addSeparator = (groupNum > 0); // default behavior.
-				if ([delegate respondsToSelector:@selector(scopeBar:showSeparatorBeforeGroup:)]) {
-					addSeparator = [delegate scopeBar:self showSeparatorBeforeGroup:groupNum];
+				if ([dataSource respondsToSelector:@selector(scopeBar:showSeparatorBeforeGroup:)]) {
+					addSeparator = [dataSource scopeBar:self showSeparatorBeforeGroup:groupNum];
 				}
 				if (addSeparator) {
 					[_separatorPositions addObject:[NSNumber numberWithInt:xCoord]];
@@ -167,7 +169,7 @@
 				}
 				
 				// Add label if appropriate.
-				NSString *groupLabel = [delegate scopeBar:self labelForGroup:groupNum];
+				NSString *groupLabel = [dataSource scopeBar:self labelForGroup:groupNum];
 				NSTextField *labelField = nil;
 				BOOL hasLabel = NO;
 				if (groupLabel && [groupLabel length] > 0) {
@@ -193,10 +195,10 @@
 				}
 				
 				// Create group information for use during interaction.
-				NSArray *identifiers = [delegate scopeBar:self itemIdentifiersForGroup:groupNum];
+				NSArray *identifiers = [dataSource scopeBar:self itemIdentifiersForGroup:groupNum];
 				NSMutableArray *usedIdentifiers = [NSMutableArray arrayWithCapacity:[identifiers count]];
 				NSMutableArray *buttons = [NSMutableArray arrayWithCapacity:[identifiers count]];
-				MGScopeBarGroupSelectionMode selMode = [delegate scopeBar:self selectionModeForGroup:groupNum];
+				MGScopeBarGroupSelectionMode selMode = [dataSource scopeBar:self selectionModeForGroup:groupNum];
 				if (selMode != MGRadioSelectionMode && selMode != MGMultipleSelectionMode) {
 					// Sanity check, since this is just an int.
 					selMode = MGRadioSelectionMode;
@@ -226,10 +228,10 @@
 						continue;
 					}
 					
-					NSString *title = [delegate scopeBar:self titleOfItem:itemID inGroup:groupNum];
+					NSString *title = [dataSource scopeBar:self titleOfItem:itemID inGroup:groupNum];
 					NSImage *image = nil;
 					if (providesImages) {
-						image = [delegate scopeBar:self imageForItem:itemID inGroup:groupNum];
+						image = [dataSource scopeBar:self imageForItem:itemID inGroup:groupNum];
 					}
 					NSButton *button = [self buttonForItem:itemID inGroup:groupNum withTitle:title image:image];
 					
@@ -274,8 +276,8 @@
 		}
 		
 		// Add accessoryView, if provided.
-		if ([delegate respondsToSelector:@selector(accessoryViewForScopeBar:)]) {
-			_accessoryView = [delegate accessoryViewForScopeBar:self];
+		if ([dataSource respondsToSelector:@selector(accessoryViewForScopeBar:)]) {
+			_accessoryView = [dataSource accessoryViewForScopeBar:self];
 			if (_accessoryView) {
 				// Remove NSViewMaxXMargin flag from resizing mask, if present.
 				NSUInteger mask = [_accessoryView autoresizingMask];
@@ -1015,10 +1017,16 @@
 {
 	if (delegate != newDelegate) {
 		delegate = newDelegate;
-		[self reloadData];
 	}
 }
 
+- (void)setDataSource:(id)newDataSource
+{
+	if (dataSource != newDataSource) {
+		dataSource = newDataSource;
+		[self reloadData];
+	}
+}
 
 - (BOOL)smartResizeEnabled
 {
@@ -1036,6 +1044,7 @@
 
 
 @synthesize delegate;
+@synthesize dataSource;
 
 
 @end
