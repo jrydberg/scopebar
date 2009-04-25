@@ -62,7 +62,7 @@ MGScopeBarDataSource = objc.informal_protocol(
         objc.selector(
             None,
             selector="accessoryViewForScopeBar:",
-            signature="@:@",
+            signature="@@:@",
             isRequired=0,
             ),
         ]
