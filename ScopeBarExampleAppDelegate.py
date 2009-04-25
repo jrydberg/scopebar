@@ -12,10 +12,16 @@ from MGScopeBar import *
 
 class ScopeBarExampleAppDelegate(NSObject):
     label = objc.IBOutlet()
-
+    accessory = objc.IBOutlet()
+    scopeBar = objc.IBOutlet()
+    
     def applicationDidFinishLaunching_(self, sender):
         NSLog("Application did finish launching.")
-
+        self.scopeBar.reloadData()
+        
+    def accessoryViewForScopeBar_(self, view):
+        return self.accessory
+    
     def numberOfGroupsInScopeBar_(self, view):
         """
         Return the number of groups in the scope bar.
